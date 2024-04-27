@@ -53,7 +53,7 @@ VALIDATE $? "Entering into nginx html folder"
 unzip /tmp/frontend.zip &>>$LOGFILE
 VALIDATE $? "Copy the frontend code"
 
-cp -rf /home/ec2-user/EXP2/expense.conf /etc/nginx/default.d/expense.conf &>>$LOGFILE
+cp -rf /home/ec2-user/SIPR2/expense.conf /etc/nginx/default.d/expense.conf &>>$LOGFILE
 VALIDATE $? "copying expense.conf"
 
 systemctl restart nginx &>>$LOGFILE
