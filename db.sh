@@ -1,3 +1,4 @@
+
 #!/bin/bash
 TIMESTAMP=$(date +%F-%H-%M-%S)
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
@@ -36,25 +37,19 @@ fi
 dnf install mysql-server -y &>>$LOGFILE
 VALIDATE $? "mysql server installation"
 
-
 systemctl enable mysqld &>>$LOGFILE
-VALIDATE $? "enable the mysqld"
-
+VALIDATE $? "enable mysql server"
 
 systemctl start mysqld &>>$LOGFILE
-VALIDATE $? "start the mysqld"
+VALIDATE $? "start mysql server"
 
-#idempotency   
-
+#idempotency  
 mysql -h db.daws78s-nnr.online -uroot -p${DB_SERVER_PASSWORD} -e 'show databases' &>>$LOGFILE
 if [ $? -ne 0 ];
-then
+then 
     mysql_secure_installation --set-root-pass ${DB_SERVER_PASSWORD} &>>$LOGFILE
-    VALIDATE $? "setting up username and password for DB"
+    VALIDATE $? "set password for mysql server"
 else 
-    echo -e "Already db username and password is set... $Y SKIPPING $N "
-    
-fi 
+    echo -e "Password is already set...$Y SKIPPING $N"    
 
-#mysql_secure_installation --set-root-pass ${DB_SERVER_PASSWORD} &>>$LOGFILE
-#VALIDATE $? "setting up username and password for DB"
+fi

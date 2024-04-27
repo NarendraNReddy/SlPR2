@@ -1,3 +1,4 @@
+
 #!/bin/bash
 TIMESTAMP=$(date +%F-%H-%M-%S)
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
@@ -31,75 +32,67 @@ then
     exit 1
 else 
     echo "Super User"     
-fi
-
+fi  
 
 
 dnf module disable nodejs -y &>>$LOGFILE
-VALIDATE $? "Disable Node JS"
-
+VALIDATE $? "nodejs module disable"
 
 dnf module enable nodejs:20 -y &>>$LOGFILE
-VALIDATE $? "Enable Node Js:20"
-
+VALIDATE $? "enable nodejs:20 module"
 
 dnf install nodejs -y &>>$LOGFILE
-VALIDATE $? "Installation Node JS "
-
+VALIDATE $? "install nodejs"
 
 id expense &>>$LOGFILE
 if [ $? -ne 0 ];
-then
-    useradd expense 
-    VALIDATE $? "Adding the user expense"
+then 
+    useradd expense &>>$LOGFILE
+    VALIDATE $? "user expense added"
 else 
-    echo -e "User expense is already present ... $Y SKIPPING $N"    
-fi 
+    echo -e "user expense already present..$Y SKIPPING $N"    
+fi
 
 
 mkdir -p /app &>>$LOGFILE
-VALIDATE $? "created app directory"
+VALIDATE $? "app dir created"
 
-curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>$LOGFILE
-VALIDATE $? "Download code to tmp folder"
-
-
-cd /app &>>$LOGFILE
-VALIDATE $? "Move to app folder"
+curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip  &>>$LOGFILE
+VALIDATE $? "backend code in /tmp directory"
 
 rm -rf /app/* &>>$LOGFILE
-VALIDATE $? "Removed the app in app folder"
+VALIDATE $? "Remove everything in app"
+
+cd /app &>>$LOGFILE
+VALIDATE $? "Enter into app"
 
 unzip /tmp/backend.zip &>>$LOGFILE
-VALIDATE $? "Unzip the backend code"
-
+VALIDATE $? "Unzip the backend code in app"
 
 npm install &>>$LOGFILE
-VALIDATE $? "NPM install for node js"
+VALIDATE $? "Instllating the npm"
 
-cp -rf /home/ec2-user/SIPR2/backend.service /etc/systemd/system/backend.service &>>$LOGFILE
-VALIDATE $? "copying the backend service"
+cp -rf /home/ec2-user/EXP4/backend.service  /etc/systemd/system/backend.service &>>$LOGFILE
+VALIDATE $? "Backend.service is copied"
 
 
 systemctl daemon-reload &>>$LOGFILE
-VALIDATE $? "daemon reload"
+VALIDATE $? "daemon-reload"
 
 
 systemctl start backend &>>$LOGFILE
-VALIDATE $? "backend starts"
-
+VALIDATE $? "start backend"
 
 systemctl enable backend &>>$LOGFILE
-VALIDATE $? "backend enable"
+VALIDATE $? "enable backend"
 
 
+dnf install mysql -y &>>$LOGFILE
+VALIDATE $? "install mysql client "
 
-dnf install mysql -y  &>>$LOGFILE
-VALIDATE $? "instll mysql client"
 
-
-mysql -h db.daws78s-nnr.online -uroot -p${DB_SERVER_PASSWORD} < /app/schema/backend.sql &>>$LOGFILE
-VALIDATE $? "Schema loading"
+mysql -h  db.daws78s-nnr.online -uroot -p${DB_SERVER_PASSWORD} < /app/schema/backend.sql &>>$LOGFILE
+VALIDATE $? "DB to backend connection"
 
 systemctl restart backend &>>$LOGFILE
 VALIDATE $? "Restart backend"
