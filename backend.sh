@@ -77,7 +77,7 @@ VALIDATE $? "Unzip the backend code"
 npm install &>>$LOGFILE
 VALIDATE $? "NPM install for node js"
 
-cp -rf /home/ec2-user/SlPR2/backend.service /etc/systemd/system/backend.service &>>$LOGFILE
+cp -rf /home/ec2-user/SIPR2/backend.service /etc/systemd/system/backend.service &>>$LOGFILE
 VALIDATE $? "copying the backend service"
 
 
